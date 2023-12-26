@@ -8,10 +8,9 @@ import { findOrCreateThread, assistantResponse, transcribeOpenAI } from '../prov
 import { moderateIncomingPrompt } from './moderation'
 import { ttsRequest } from '../providers/speech'
 
-const handleMessageGPT = async (message: any, prompt: string) => {
+const handleMessageGPT = async (message: Message, prompt: string) => {
 	try {
 		cli.print(`[GPT] Received prompt from ${message.from}: ${prompt}`)
-
 		const start = Date.now()
 
 		await moderateIncomingPrompt(prompt)
@@ -19,6 +18,7 @@ const handleMessageGPT = async (message: any, prompt: string) => {
 		await message.react(`💬`)
 
 		const meta = {
+			// @ts-ignore
 			name: message._data.notifyName || message.author
 		}
 
@@ -30,7 +30,7 @@ const handleMessageGPT = async (message: any, prompt: string) => {
 				type: 'function',
 				function: {
 					name: 'reactToUserMessage',
-					description: 'Based on human input reacts to message with appropriate emoji',
+					description: 'Based on human input react to message with appropriate emoji',
 					parameters: {
 						type: 'object',
 						properties: {
@@ -71,15 +71,18 @@ const handleMessageGPT = async (message: any, prompt: string) => {
 
 		console.log(response?.text.value.trim(), emoji)
 		if (response?.text.value.trim() === emoji) return
+
 		// Default: Text reply
-		message.reply(response?.text.value)
-	} catch (error: any) {
+		if (response?.text?.value) {
+			message.reply(response.text.value)
+		}
+	} catch (error) {
 		console.error('An error occured', error)
 		message.reply('An error occured, please contact the administrator. (' + error.message + ')')
 	}
 }
 
-async function handleVoiceMessageReply(message: any) {
+async function handleVoiceMessageReply(message: Message) {
 	const media = await message.downloadMedia()
 
 	// Ignore non-audio media
@@ -113,6 +116,7 @@ async function handleVoiceMessageReply(message: any) {
 	await moderateIncomingPrompt(transcribedText)
 
 	const meta = {
+		// @ts-ignore
 		name: message._data.notifyName || message.author
 	}
 	const threadId = await findOrCreateThread(message.from, meta)

@@ -16,8 +16,7 @@ const handleMessageDALLE = async (message: Message, prompt: string) => {
 			prompt: prompt,
 			n: 1,
 			size: '512x512',
-			response_format: 'b64_json',
-			quality: 'standard'
+			response_format: 'b64_json'
 		})
 
 		const end = Date.now() - start
