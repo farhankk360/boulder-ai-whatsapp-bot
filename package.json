@@ -1,0 +1,29 @@
+{
+	"name": "boulder-ai-whatsapp-bot",
+	"version": "1.0.0",
+	"description": "Boulder Whatsapp bot with a particular persona that uses OpenAI's GPT & DALLE to respond to user inputs",
+	"main": "src/index.ts",
+	"author": "farhankk360",
+	"scripts": {
+		"start": "npx vite-node src/index.ts",
+		"prettier": "prettier --write ./src"
+	},
+	"license": "MIT",
+	"dependencies": {
+		"dotenv": "^16.3.1",
+		"fetch-blob": "^4.0.0",
+		"ffmpeg": "^0.0.4",
+		"openai": "^4.24.0",
+		"picocolors": "^1.0.0",
+		"qrcode": "^1.5.3",
+		"whatsapp-web.js": "https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_7",
+		"elevenlabs-node": "^2.0.1"
+	},
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"devDependencies": {
+		"@types/qrcode": "^1.5.2",
+		"prettier": "^3.1.1"
+	}
+}

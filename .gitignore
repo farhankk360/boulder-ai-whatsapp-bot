@@ -1,0 +1,7 @@
+node_modules/*
+.env
+session/
+.DS_Store
+.wwebjs_cache
+.session
+threads/*
