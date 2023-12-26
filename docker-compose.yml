@@ -1,0 +1,14 @@
+version: '3'
+services:
+    boulder-ai-whatsapp-bot:
+        container_name: boulder-ai-whatsapp-bot
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        volumes:
+            - session-data:/app/session
+            - threads-data:/app/threads
+volumes:
+    session-data:
+    threads-data:
