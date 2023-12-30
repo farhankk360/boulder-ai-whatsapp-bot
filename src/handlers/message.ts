@@ -5,7 +5,7 @@ import { handleMessageGPT, handleVoiceMessageReply } from '../handlers/gpt'
 import { handleMessageDALLE } from '../handlers/dalle'
 
 // For deciding to ignore old messages
-import { botReadyTimestamp } from '../index'
+import { botReadyTimestamp } from '../whatsAppBot'
 import config from '../config'
 
 const DALLE_TRIGGER = '/imagine'

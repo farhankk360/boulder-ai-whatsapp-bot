@@ -2,7 +2,6 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import { randomUUID } from 'crypto'
-import { blobFromSync, File } from 'fetch-blob/from.js'
 import { convertOggToWav } from '../utils'
 import OpenAI from 'openai'
 import config from '../config'
@@ -106,6 +105,7 @@ export async function transcribeOpenAI(audioBuffer: Buffer): Promise<{ text: str
 	const wavPath = path.join(tempdir, wavFilename)
 
 	try {
+		const { blobFromSync, File } = await import('fetch-blob/from.js')
 		fs.writeFileSync(oggPath, audioBuffer)
 		await convertOggToWav(oggPath, wavPath)
 

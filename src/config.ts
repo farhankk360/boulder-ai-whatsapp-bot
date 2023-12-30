@@ -12,7 +12,9 @@ export const config = {
 	elevenLabsAPIKey: process.env.ELEVENLABS_API_KEY || '',
 	elevenLabsVoiceId: process.env.ELEVENLABS_VOICE_ID || '',
 	whatsAppNumber: process.env.WHATSAPP_NUMBER || '',
-	botName: process.env.BOT_NAME || 'Boulder'
+	botName: process.env.BOT_NAME || 'Boulder',
+	SERVER_PING_URL: process.env.SERVER_PING_URL || '',
+	KEEP_SERVER_ALIVE: process.env.KEEP_SERVER_ALIVE || false
 }
 
 export default config

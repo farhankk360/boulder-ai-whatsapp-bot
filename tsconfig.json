@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"strict": false,
+		"noImplicitAny": false,
+		"noFallthroughCasesInSwitch": false,
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"module": "commonjs",
+		"target": "es5"
+	}
+}

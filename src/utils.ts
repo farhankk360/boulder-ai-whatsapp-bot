@@ -1,6 +1,6 @@
 import ffmpeg from 'fluent-ffmpeg'
 
-export const startsWithIgnoreCase = (str, prefix) => str.toLowerCase().startsWith(prefix.toLowerCase())
+export const startsWithIgnoreCase = (str: string, prefix: string) => str.toLowerCase().startsWith(prefix.toLowerCase())
 
 export const convertOggToWav = async (oggPath: string, wavPath: string): Promise<void> => {
 	return new Promise((resolve, reject) => {
