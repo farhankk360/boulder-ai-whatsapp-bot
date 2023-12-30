@@ -48,10 +48,11 @@ export async function assistantResponse(threadId: string, prompt: string, tools:
 
 			// we must submit the tool outputs to the run to continue
 			await openai.beta.threads.runs.submitToolOutputs(threadId, run.id, {
-				tool_outputs: outputs.map((output: any) => ({
-					tool_call_id: output.id,
-					output: JSON.stringify(output.output)
-				}))
+				tool_outputs:
+					outputs?.map((output: any) => ({
+						tool_call_id: output.id,
+						output: JSON.stringify(output.output)
+					})) || []
 			})
 		}
 
@@ -83,6 +84,7 @@ export async function findOrCreateThread(id: string, meta: any) {
 	// check if thread exists
 	const threadPath = `${threadsPath}/${id}.json`
 	if (fs.existsSync(threadPath)) {
+		console.log('Thread exists', threadPath)
 		return JSON.parse(fs.readFileSync(threadPath, 'utf8')).openAiThreadId
 	} else {
 		const openaiThread = await openai.beta.threads.create({ metadata: { name: meta.name } })
@@ -92,6 +94,7 @@ export async function findOrCreateThread(id: string, meta: any) {
 			openAiThreadId: openaiThread.id
 		}
 
+		console.log('Creating new thread', threadPath, newThread)
 		fs.writeFileSync(threadPath, JSON.stringify(newThread))
 
 		return openaiThread.id
