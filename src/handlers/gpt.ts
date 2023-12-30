@@ -83,68 +83,77 @@ const handleMessageGPT = async (message: Message, prompt: string) => {
 }
 
 async function handleVoiceMessageReply(message: Message) {
-	const media = await message.downloadMedia()
+	try {
+		const media = await message.downloadMedia()
 
-	// Ignore non-audio media
-	if (!media || !media.mimetype.startsWith('audio/')) {
-		message.reply('I can only process audio messages.')
-		return
+		// Ignore non-audio media
+		if (!media || !media.mimetype.startsWith('audio/')) {
+			message.reply('I can only process audio messages.')
+			return
+		}
+
+		const start = Date.now()
+
+		// Convert media to base64 string
+		const mediaBuffer = Buffer.from(media.data, 'base64')
+
+		const { text: transcribedText } = await transcribeOpenAI(mediaBuffer)
+
+		// Check transcription is null (error)
+		if (transcribedText == null) {
+			message.reply("I couldn't understand what you said.")
+			return
+		}
+
+		// Check transcription is empty (silent voice message)
+		if (transcribedText.length == 0) {
+			message.reply("I couldn't understand what you said.")
+			return
+		}
+
+		// Log transcription
+		cli.print(`[Transcription] Transcription response: ${transcribedText}`)
+
+		await moderateIncomingPrompt(transcribedText)
+
+		const meta = {
+			// @ts-ignore
+			name: message._data.notifyName || message.author
+		}
+		const threadId = await findOrCreateThread(message.from, meta)
+		const response = (await assistantResponse(threadId, `${meta.name}: ${transcribedText}`)) as any
+
+		const end = Date.now() - start
+		cli.print(`[GPT] Answer to ${message.from}: ${response.text.value}  | OpenAI request took ${end}ms)`)
+
+		// Get audio buffer
+		cli.print(`[TTS] Generating audio from GPT response...`)
+		const audioBuffer = await ttsRequest(response.text.value)
+		// Check if audio buffer is valid
+		if (audioBuffer == null || audioBuffer.length == 0) {
+			message.reply(`[TTS] couldn't generate audio, please contact the administrator.`)
+			return
+		}
+
+		cli.print(`[TTS] Audio generated!`)
+		// Get temp folder and file path
+		const tempFolder = os.tmpdir()
+		const tempFilePath = path.join(tempFolder, randomUUID() + '.opus')
+
+		cli.print(`[TTS] Saving audio to temp file... ${tempFilePath}`)
+		// Save buffer to temp file
+		fs.writeFileSync(tempFilePath, audioBuffer)
+
+		cli.print(`[TTS] Sending audio...`)
+		// Send audio
+		const messageMedia = new MessageMedia('audio/ogg; codecs=opus', audioBuffer.toString('base64'))
+		message.reply(messageMedia)
+		// Delete temp file
+		fs.unlinkSync(tempFilePath)
+	} catch (error) {
+		console.error('An error occured', error)
+		message.reply('An error occured, please contact the administrator. (' + error.message + ')')
 	}
-
-	const start = Date.now()
-
-	// Convert media to base64 string
-	const mediaBuffer = Buffer.from(media.data, 'base64')
-
-	const { text: transcribedText } = await transcribeOpenAI(mediaBuffer)
-
-	// Check transcription is null (error)
-	if (transcribedText == null) {
-		message.reply("I couldn't understand what you said.")
-		return
-	}
-
-	// Check transcription is empty (silent voice message)
-	if (transcribedText.length == 0) {
-		message.reply("I couldn't understand what you said.")
-		return
-	}
-
-	// Log transcription
-	cli.print(`[Transcription] Transcription response: ${transcribedText}`)
-
-	await moderateIncomingPrompt(transcribedText)
-
-	const meta = {
-		// @ts-ignore
-		name: message._data.notifyName || message.author
-	}
-	const threadId = await findOrCreateThread(message.from, meta)
-	const response = (await assistantResponse(threadId, `${meta.name}: ${transcribedText}`)) as any
-
-	const end = Date.now() - start
-	cli.print(`[GPT] Answer to ${message.from}: ${response.text.value}  | OpenAI request took ${end}ms)`)
-
-	// Get audio buffer
-	cli.print(`[TTS] Generating audio from GPT response...`)
-	const audioBuffer = await ttsRequest(response.text.value)
-	// Check if audio buffer is valid
-	if (audioBuffer == null || audioBuffer.length == 0) {
-		message.reply(`[TTS] couldn't generate audio, please contact the administrator.`)
-		return
-	}
-
-	cli.print(`[TTS] Audio generated!`)
-	// Get temp folder and file path
-	const tempFolder = os.tmpdir()
-	const tempFilePath = path.join(tempFolder, randomUUID() + '.opus')
-	// Save buffer to temp file
-	fs.writeFileSync(tempFilePath, audioBuffer)
-	// Send audio
-	const messageMedia = new MessageMedia('audio/ogg; codecs=opus', audioBuffer.toString('base64'))
-	message.reply(messageMedia)
-	// Delete temp file
-	fs.unlinkSync(tempFilePath)
 }
 
 async function reactToUserMessage(message: Message, emoji: string) {
