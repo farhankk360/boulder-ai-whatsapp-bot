@@ -34,8 +34,9 @@ export async function assistantResponse(threadId: string, prompt: string, tools:
 		tools,
 		assistant_id: config.openAIAssistantId,
 		additional_instructions: `You will be interacting with users via whatsapp messages, 
-		occasionally use emojis in conversations.
-		It is important along with your response if you have tools available, do a sentiment analysis on the human input and react with appropriate emoji.`
+		occasionally sprinkle emojis in conversations as means of communication.
+		It is important along with your answer if you have tools available, 
+		do a sentiment analysis on the human input and react with appropriate emoji.`
 	})
 
 	let actualRun = await openai.beta.threads.runs.retrieve(threadId, run.id)

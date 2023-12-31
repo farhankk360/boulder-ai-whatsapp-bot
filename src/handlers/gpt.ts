@@ -87,6 +87,8 @@ async function handleVoiceMessageReply(message: Message) {
 		const end = Date.now() - start
 		cli.print(`[GPT] Answer to ${message.from}: ${response.text.value}  | OpenAI request took ${end}ms)`)
 
+		if (!response?.text?.value) return
+
 		// Get audio buffer
 		cli.print(`[TTS] Generating audio from GPT response...`)
 		const audioBuffer = await ttsRequest(response.text.value)
