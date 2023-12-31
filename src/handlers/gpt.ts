@@ -8,69 +8,35 @@ import { findOrCreateThread, assistantResponse, transcribeOpenAI } from '../prov
 import { moderateIncomingPrompt } from './moderation'
 import { ttsRequest } from '../providers/speech'
 
+const tools = [
+	{
+		type: 'function',
+		function: {
+			name: 'reactToUserMessage',
+			description: 'Based on human input react to message with appropriate emoji',
+			parameters: {
+				type: 'object',
+				properties: {
+					emoji: {
+						type: 'string'
+					}
+				}
+			},
+			required: ['emoji']
+		}
+	}
+]
+
 const handleMessageGPT = async (message: Message, prompt: string) => {
 	try {
 		cli.print(`[GPT] Received prompt from ${message.from}: ${prompt}`)
 		const start = Date.now()
-
 		await moderateIncomingPrompt(prompt)
 
-		await message.react(`💬`)
-
-		const meta = {
-			// @ts-ignore
-			name: message._data.notifyName || message.author
-		}
-
-		cli.print(`[GPT] meta info: ${JSON.stringify(meta)}`)
-
-		const threadId = await findOrCreateThread(message.from, meta)
-		const tools = [
-			{
-				type: 'function',
-				function: {
-					name: 'reactToUserMessage',
-					description: 'Based on human input react to message with appropriate emoji',
-					parameters: {
-						type: 'object',
-						properties: {
-							emoji: {
-								type: 'string'
-							}
-						}
-					},
-					required: ['emoji']
-				}
-			}
-		]
-
-		let emoji = ''
-		const response = await assistantResponse(threadId, `${meta.name}: ${prompt}`, tools, async (run) => {
-			if (run.required_action?.submit_tool_outputs?.tool_calls[0].function.name === 'reactToUserMessage') {
-				emoji = JSON.parse(run.required_action?.submit_tool_outputs?.tool_calls[0].function.arguments || '{}').emoji
-
-				try {
-					await reactToUserMessage(message, emoji)
-				} catch (error) {
-					console.error('Error reacting to user message', error, emoji)
-				}
-
-				return [
-					{
-						id: run.required_action?.submit_tool_outputs?.tool_calls[0].id,
-						output: {
-							success: true
-						}
-					}
-				]
-			}
-		})
+		const response = await handleAssistantResponse(message, prompt)
 
 		const end = Date.now() - start
 		cli.print(`[GPT] Answer to ${message.from}: ${response?.text.value} | OpenAI request took ${end}ms)`)
-
-		console.log(response?.text.value.trim(), emoji)
-		if (response?.text.value.trim() === emoji) return
 
 		// Default: Text reply
 		if (response?.text?.value) {
@@ -116,12 +82,7 @@ async function handleVoiceMessageReply(message: Message) {
 
 		await moderateIncomingPrompt(transcribedText)
 
-		const meta = {
-			// @ts-ignore
-			name: message._data.notifyName || message.author
-		}
-		const threadId = await findOrCreateThread(message.from, meta)
-		const response = (await assistantResponse(threadId, `${meta.name}: ${transcribedText}`)) as any
+		const response = await handleAssistantResponse(message, transcribedText)
 
 		const end = Date.now() - start
 		cli.print(`[GPT] Answer to ${message.from}: ${response.text.value}  | OpenAI request took ${end}ms)`)
@@ -158,6 +119,54 @@ async function handleVoiceMessageReply(message: Message) {
 
 async function reactToUserMessage(message: Message, emoji: string) {
 	return message.react(emoji)
+}
+
+async function handleAssistantResponse(message: Message, prompt: string) {
+	await message.react(`💬`)
+
+	const chatInfo = await message.getChat()
+	const meta: any = {
+		// @ts-ignore
+		name: message._data.notifyName || message.author,
+		groupName: chatInfo.name,
+		isGroup: chatInfo.isGroup
+	}
+
+	console.log(`[GPT] meta info: ${meta}`)
+
+	const threadId = await findOrCreateThread(message.from, meta)
+
+	let emoji = ''
+	const p = `${chatInfo.timestamp} ${chatInfo.isGroup ? `(${chatInfo.name}) ` : ''}${meta.name}: ${prompt}`
+
+	cli.print(`[GPT] Sending prompt to OpenAI: ${p}`)
+
+	const response = await assistantResponse(threadId, p, tools, async (run) => {
+		if (run.required_action?.submit_tool_outputs?.tool_calls[0].function.name === 'reactToUserMessage') {
+			emoji = JSON.parse(run.required_action?.submit_tool_outputs?.tool_calls[0].function.arguments || '{}').emoji
+
+			try {
+				await reactToUserMessage(message, emoji)
+			} catch (error) {
+				console.error('Error reacting to user message', error, emoji)
+			}
+
+			return [
+				{
+					id: run.required_action?.submit_tool_outputs?.tool_calls[0].id,
+					output: {
+						success: true
+					}
+				}
+			]
+		}
+	})
+
+	if (response?.text.value.trim() === emoji) {
+		response.text.value = ''
+	}
+
+	return response
 }
 
 export { handleMessageGPT, handleVoiceMessageReply }

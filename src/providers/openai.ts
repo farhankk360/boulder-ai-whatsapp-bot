@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto'
 import { convertOggToWav } from '../utils'
 import OpenAI from 'openai'
 import config from '../config'
+import { Thread } from '../database'
 
 export const openai = new OpenAI({ apiKey: config.openAIAPIKey })
 
@@ -75,27 +76,22 @@ export async function assistantResponse(threadId: string, prompt: string, tools:
 }
 
 export async function findOrCreateThread(id: string, meta: any) {
-	// check if thread folder exists
-	const threadsPath = `${process.cwd()}/threads`
-	if (!fs.existsSync(threadsPath)) {
-		fs.mkdirSync(threadsPath)
-	}
+	const thread = await Thread.findOne({ where: { identifier: id } })
 
-	// check if thread exists
-	const threadPath = `${threadsPath}/${id}.json`
-	if (fs.existsSync(threadPath)) {
-		console.log('Thread exists', threadPath)
-		return JSON.parse(fs.readFileSync(threadPath, 'utf8')).openAiThreadId
+	if (thread) {
+		console.log('Thread exists')
+		return thread.openai_thread_id
 	} else {
-		const openaiThread = await openai.beta.threads.create({ metadata: { name: meta.name } })
+		const openaiThread = await openai.beta.threads.create({ metadata: { identifier: id, medium: 'whatsapp' } })
 		const newThread = {
-			id: id,
-			name: meta.name,
-			openAiThreadId: openaiThread.id
+			identifier: id,
+			openai_thread_id: openaiThread.id,
+			medium: 'whatsapp'
 		}
 
-		console.log('Creating new thread', threadPath, newThread)
-		fs.writeFileSync(threadPath, JSON.stringify(newThread))
+		await Thread.create(newThread)
+
+		console.log('New thread created', newThread)
 
 		return openaiThread.id
 	}

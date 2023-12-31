@@ -15,6 +15,7 @@ COPY package.json yarn.lock ./
 
 RUN yarn
 RUN yarn add vite-node
+RUN yarn migrate
 
 COPY . .
 

@@ -7,7 +7,8 @@
 	"scripts": {
 		"dev": "ts-node-dev --respawn --transpile-only --exit-child src/index.ts",
 		"start": "npx vite-node src/index.ts",
-		"prettier": "prettier --write ./src"
+		"prettier": "prettier --write ./src",
+		"migrate": "npx vite-node src/bin/migrate.ts"
 	},
 	"license": "MIT",
 	"dependencies": {
@@ -19,7 +20,9 @@
 		"qrcode": "^1.5.3",
 		"whatsapp-web.js": "https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_7",
 		"elevenlabs-node": "^2.0.1",
-		"express": "^4.18.2"
+		"express": "^4.18.2",
+		"pg": "^8.11.3",
+		"sequelize": "^6.35.2"
 	},
 	"engines": {
 		"node": ">=18.0.0"

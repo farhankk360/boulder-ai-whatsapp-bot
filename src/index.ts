@@ -18,12 +18,12 @@ app.listen(PORT, () => {
 // Start the bot
 start()
 
-if (config.KEEP_SERVER_ALIVE === 'true' && config.SERVER_PING_URL) {
+if (config.keepServerAlive === 'true' && config.serverPingUrl) {
 	// ping the server every 10 minutes to keep it alive
 	cron.schedule('*/10 * * * *', () => {
 		console.log('pinging server...')
 
-		fetch(config.SERVER_PING_URL)
+		fetch(config.serverPingUrl)
 			.then((res) => res.text())
 			.then((body) => console.log(body))
 			.catch((err) => console.error(err))

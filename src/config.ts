@@ -13,8 +13,13 @@ export const config = {
 	elevenLabsVoiceId: process.env.ELEVENLABS_VOICE_ID || '',
 	whatsAppNumber: process.env.WHATSAPP_NUMBER || '',
 	botName: process.env.BOT_NAME || 'Boulder',
-	SERVER_PING_URL: process.env.SERVER_PING_URL || '',
-	KEEP_SERVER_ALIVE: process.env.KEEP_SERVER_ALIVE || false
+	serverPingUrl: process.env.SERVER_PING_URL || '',
+	keepServerAlive: process.env.KEEP_SERVER_ALIVE || false,
+	dbSchema: process.env.DB_SCHEMA || 'postgres',
+	dbHost: process.env.DB_HOST || 'localhost',
+	dbPort: process.env.DB_PORT || 5432,
+	dbUser: process.env.DB_USER || 'postgres',
+	dbPassword: process.env.DB_PASSWORD || ''
 }
 
 export default config
