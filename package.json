@@ -6,7 +6,7 @@
 	"author": "farhankk360",
 	"scripts": {
 		"dev": "ts-node-dev --respawn --transpile-only --exit-child src/index.ts",
-		"start": "npx vite-node src/index.ts",
+		"start": "yarn migrate && npx vite-node src/index.ts",
 		"prettier": "prettier --write ./src",
 		"migrate": "npx vite-node src/bin/migrate.ts"
 	},
