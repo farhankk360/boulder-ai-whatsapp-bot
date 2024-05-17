@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+    app:
+        depends_on:
+            - db
+        container_name: boulder-ai-whatsapp-bot
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        volumes:
+            - session-data:/app/session
+        env_file: ./.env
+        ports:
+            - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+        environment:
+            - DB_HOST=db
+            - DB_USER=$POSTGRESDB_USER
+            - DB_PASSWORD=$POSTGRESDB_ROOT_PASSWORD
+            - DB_NAME=$POSTGRESDB_DATABASE
+            - DB_PORT=$POSTGRESDB_DOCKER_PORT
+        stdin_open: true
+        tty: true
+
+    db:
+        image: postgres
+        restart: unless-stopped
+        env_file: ./.env
+        environment:
+            - POSTGRES_USER=$POSTGRESDB_USER
+            - POSTGRES_PASSWORD=$POSTGRESDB_ROOT_PASSWORD
+            - POSTGRES_DB=$POSTGRESDB_DATABASE
+        ports:
+            - $POSTGRESDB_LOCAL_PORT:$POSTGRESDB_DOCKER_PORT
+        volumes:
+            - db:/var/lib/postgres
+
+volumes:
+    db:
+    session-data:

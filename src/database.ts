@@ -7,6 +7,12 @@ const db = new Sequelize(config.dbSchema, config.dbUser, config.dbPassword, {
 	dialect: 'postgres',
 	dialectOptions: {
 		ssl: process.env.DB_SSL == 'true'
+	},
+	pool: {
+		max: config.pool.max,
+		min: config.pool.min,
+		acquire: config.pool.acquire,
+		idle: config.pool.idle
 	}
 })
 
