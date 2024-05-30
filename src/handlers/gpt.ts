@@ -7,8 +7,9 @@ import { Message, MessageMedia } from 'whatsapp-web.js'
 import { findOrCreateThread, assistantResponse, transcribeOpenAI } from '../providers/openai'
 import { moderateIncomingPrompt } from './moderation'
 import { ttsRequest } from '../providers/speech'
+import type { FunctionTool } from 'openai/resources/beta/assistants'
 
-const tools = [
+const tools: FunctionTool[] = [
 	{
 		type: 'function',
 		function: {
@@ -20,9 +21,9 @@ const tools = [
 					emoji: {
 						type: 'string'
 					}
-				}
-			},
-			required: ['emoji']
+				},
+				required: ['emoji']
+			}
 		}
 	}
 ]
@@ -120,7 +121,8 @@ async function handleVoiceMessageReply(message: Message) {
 }
 
 async function reactToUserMessage(message: Message, emoji: string) {
-	return message.react(emoji)
+	console.log(`[GPT] Reacting to user message with emoji: ${emoji}`)
+	return message.react(`${emoji}`)
 }
 
 async function handleAssistantResponse(message: Message, prompt: string) {

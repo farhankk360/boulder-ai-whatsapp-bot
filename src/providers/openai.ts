@@ -32,6 +32,8 @@ export async function assistantResponse(threadId: string, prompt: string, tools:
 	// Use runs to wait for the assistant response and then retrieve it
 	const run = await openai.beta.threads.runs.create(threadId, {
 		tools,
+		tool_choice: 'auto',
+		model: config.openAIModel,
 		assistant_id: config.openAIAssistantId,
 		additional_instructions: `You will be interacting with users via whatsapp messages, 
 		occasionally sprinkle emojis in conversations as means of communication.
