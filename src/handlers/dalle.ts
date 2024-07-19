@@ -1,4 +1,4 @@
-import { Message, MessageMedia } from 'whatsapp-web.js'
+import { Message, MessageMedia } from '@periskope/whatsapp-web.js'
 import { openai } from '../providers/openai'
 import { moderateIncomingPrompt } from './moderation'
 import * as cli from '../cli/ui'

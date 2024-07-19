@@ -12,29 +12,29 @@
 	},
 	"license": "MIT",
 	"dependencies": {
+		"@periskope/whatsapp-web.js": "^1.23.1-alpha.exodus.16",
 		"dotenv": "^16.3.1",
+		"elevenlabs-node": "^2.0.1",
+		"express": "^4.18.2",
 		"fetch-blob": "^4.0.0",
 		"ffmpeg": "^0.0.4",
 		"openai": "^4.47.2",
+		"pg": "^8.11.3",
 		"picocolors": "^1.0.0",
 		"qrcode": "^1.5.3",
-		"whatsapp-web.js": "https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_7",
-		"elevenlabs-node": "^2.0.1",
-		"express": "^4.18.2",
-		"pg": "^8.11.3",
 		"sequelize": "^6.35.2"
 	},
 	"engines": {
 		"node": ">=18.0.0"
 	},
 	"devDependencies": {
-		"@types/fluent-ffmpeg": "^2.1.24",
-		"@types/qrcode": "^1.5.2",
 		"@types/express": "^4.17.21",
+		"@types/fluent-ffmpeg": "^2.1.24",
+		"@types/node-cron": "^3.0.11",
+		"@types/qrcode": "^1.5.2",
+		"node-cron": "^3.0.3",
 		"prettier": "^3.1.1",
 		"ts-node-dev": "^2.0.0",
-		"typescript": "^5.3.3",
-		"node-cron": "^3.0.3",
-		"@types/node-cron": "^3.0.11"
+		"typescript": "^5.3.3"
 	}
 }

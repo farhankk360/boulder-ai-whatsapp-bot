@@ -1,5 +1,5 @@
 import qrcode from 'qrcode'
-import { Client, Message, Events, LocalAuth } from 'whatsapp-web.js'
+import { Client, Message, Events, LocalAuth } from '@periskope/whatsapp-web.js'
 import { handleIncomingMessage } from './handlers/message'
 import constants from './constants'
 import * as cli from './cli/ui'

@@ -1,5 +1,5 @@
 import * as cli from '../cli/ui'
-import { Message } from 'whatsapp-web.js'
+import { Message } from '@periskope/whatsapp-web.js'
 import { startsWithIgnoreCase } from '../utils'
 import { handleMessageGPT, handleVoiceMessageReply } from '../handlers/gpt'
 import { handleMessageDALLE } from '../handlers/dalle'
